@@ -7,22 +7,21 @@ class GenMain
     {
 
         GenMain driver = new GenMain();
+        List<string> entries = driver.createUser(10);
 
-        //List<string> users = driver.createUser(10);
+        entries.AddRange(driver.createRSPGForm(15));
 
-        //List<string> entries = driver.createRSPGForm(15);
+        entries.AddRange(driver.createResource(15, 1, 2, "personal"));
+        entries.AddRange(driver.createResource(15, 1, 2, "equipment"));
+        entries.AddRange(driver.createResource(15, 1, 2, "travel"));
+        entries.AddRange(driver.createResource(15, 1, 2, "other"));
+        entries.AddRange(driver.createRatings(10, 1, 1, 15));
 
-        //List<string> entries = driver.createResource(18, 2, "personal");
-        //List<string> entries = driver.createResource(18, 2, "equipment");
-        //List<string> entries = driver.createResource(18, 2, "travel");
-        //List<string> entries = driver.createResource(18, 2, "other");
-        //List<string> entries = driver.createRatings(15, 18);
-
-        //using (StreamWriter sw = new StreamWriter("output.txt"))
-        //{
-        //    foreach (string s in entries) sw.WriteLine(s);
-        //}
-        //foreach (string s in entries) Console.WriteLine(s);
+        using (StreamWriter sw = new StreamWriter("output.txt"))
+        {
+            foreach (string s in entries) sw.WriteLine(s);
+        }
+        foreach (string s in entries) Console.WriteLine(s);
     }
 
     /// <summary>
@@ -48,18 +47,14 @@ class GenMain
         int dept = 0;
         // Used to hold the string representation of the constructor
         string user = string.Empty;
-        // Used to make generate strings easier
-        string tab = "\t";
-        string quote = "\"";
-        string newLine = "\n";
 
         Random random = new Random();
 
         // Loops through creating string of the user constructor
         for (int i = 0; i < number; i++)
         {
-            fname = random.Next(0, 21);
-            lname = random.Next(0, 21);
+            fname = random.Next(0, 20);
+            lname = random.Next(0, 20);
             college = random.Next(1, 3);
             if (college == 1)
             {
@@ -74,15 +69,20 @@ class GenMain
             user = "new User\n{";
             user += "\temail = \"" + firstNames[fname].Substring(0, 3).ToLower() + lastNames[lname].Substring(0, 3).ToLower() + "@mail.com\",\n";
             user += "\tpassword = PasswordHelper.HashPassword(\"" + firstNames[fname].Substring(0, 3).ToLower() + "\")" + ",\n";
-            user += "\tfirstName = \"" + firstNames[fname] + "\",\n";
-            user += "\tlastName = \"" + lastNames[lname] + "\",\n";
-            user += "\tCollegeId = " + college +",\n";
-            user += "\tDepartmentId = " + dept +",\n";
-            user += "\tposition = \"Professor\",\n";
-            user += "\tRSPGMember = true,\n";
-            user += "\tisRSPGChair = false,\n";
-            user += "\tisAdmin = false,\n";
-            user += "},\n";
+            user += createVariable("firstName", "string", 0, firstNames[fname]);
+            user += createVariable("firstName", "string", 0, lastNames[fname]);
+            user += createVariable("CollegeId", "int", college);
+            user += createVariable("DepartmentId", "int", dept);
+            user += createVariable("position", "string", 0, "Professor");
+            user += createVariable("RSPGMember", "string", 0, "", true);
+            user += createVariable("isRSPGChair", "bool");
+            user += createVariable("isAdmin", "bool");
+            user += "}";
+            if (i != number - 1)
+            {
+                user += ",";
+            }
+            user += "\n";
             users.Add(user);
         }
         return users;
@@ -152,8 +152,12 @@ class GenMain
             entry += createVariable("OtherParticipants", "string", 0, "None");
             entry += createVariable("RequiresIRB", "bool", 0, "None", false);
             entry += createVariable("IsSubmitted", "bool", 0, "None", isSubmitted);
-            entry += "},\n";
-
+            entry += "}";
+            if (i != number - 1)
+            {
+                entry += ",";
+            }
+            entry += "\n";
 
             entries.Add(entry);
         }
@@ -308,7 +312,7 @@ class GenMain
         for (int i = startingFormNumber; i < numberOfForms + startingFormNumber; i++)
         {
             // Loops through all the users
-            for (int j = numberOfUsers; j < startingUserNumber + numberOfUsers; j++)
+            for (int j = startingUserNumber; j < startingUserNumber + numberOfUsers - 1; j++)
             {
                 // Builds string
                 entry = "new Rating" + "\n{\n"; random.Next(50, 96);
